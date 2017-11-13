@@ -7,21 +7,43 @@ var currentAudioBuffer  = null;
 
 var volhistory = [];
 
+var filePath = "assets/";
+var fileInput;
+
+
+
+function setup() {
+  // put setup code here
+  frameRate(60);
+  createCanvas(1024, 1024);
+  angleMode(DEGREES);
+  fft = new p5.FFT();
+  amp = new p5.Amplitude();
+  playButton = document.getElementById("playButton");
+  fileInput = document.forms[0].soundFileSelect; 
+  fileInput.addEventListener("change", action);
+}
+
+
 function getFileName(){
-  var fileInput = document.forms[0].mp3FileSelect; 
-  if (fileInput.files.length > 0 && ["audio/mpeg", "audio/mp3", "audio/x-wav"].includes(fileInput.files[0].type)) {
+  if (fileInput && fileInput.files.length > 0 && ["audio/mpeg", "audio/mp3", "audio/x-wav"].includes(fileInput.files[0].type)) {
     return fileInput.files[0].name;
   }
 }
 
-function loadMusic(url) {   
+function action(){
+  var url = filePath + fileInput.files[0].name;
+  loadSound(url);
+}
+
+function loadSound(url) {   
     var req = new XMLHttpRequest();
     req.open( "GET", url, true );
     req.responseType = "arraybuffer";    
     req.onreadystatechange = function (e) {
           if (req.readyState == 4) {
              if(req.status == 200)
-                  audioContext.decodeAudioData(req.response, 
+                  getAudioContext().decodeAudioData(req.response, 
                     function(buffer) {
                              currentAudioBuffer = buffer;
                              displayBuffer(buffer);
@@ -33,20 +55,18 @@ function loadMusic(url) {
     req.send();
 }
 
-function setup() {
-  // put setup code here
-  frameRate(60);
-  createCanvas(1024, 800);
-  angleMode(DEGREES);
-  fft = new p5.FFT();
-  amp = new p5.Amplitude();
-  playButton = document.getElementById("playButton");
-}
+function onDecodeError() {  alert('error while decoding your file.');  }
+
+
+function displayBuffer(buffer){
+  console.log('buffer', buffer, buffer.getChannelData(0));
+};
 
 function draw() {
   visualize();
 
  if(getFileName() && fileState == false){
+   console.log('file selected draw');
     fileState = true; 
     song = new p5.SoundFile('assets/'+ getFileName(),loaded);
   }
@@ -69,12 +89,7 @@ function toggleSong(){
 }
 
 setInterval(function(){ 
-  var wavearray =fft.waveform();
-  var normalArray = new Array();
-  for (var j = 0; j < wavearray.length; j++) {
-        var scaled = map(wavearray[j], -1, 1, 0, 255);
-        normalArray.push(scaled);
-      }
+
       //console.log('file selected?', getFileName());
   //console.log("wave",  normalArray);
 }, 3000);
@@ -123,22 +138,6 @@ function drawSpiral(volhistory){
 
 }
 
-function displayBuffer(buffer /* is an AudioBuffer */) {
-   var leftChannel = buff.getChannelData(0); 
-   leftChannel.length
-
-/*
-function drawDots(volhistory){
-  stroke(0, 150, 50);
-  for(var i = 0; i<360; i++) {
-    var r = map(volhistory[i], 0, 0.6, 240, 340);
-    var x = r * cos(i);
-    var y = r * sin(i);
-    point(x,y);
-  }
-}
-
-
 function drawWaveform(waveform){
   noFill();
   beginShape();
@@ -150,4 +149,21 @@ function drawWaveform(waveform){
     vertex(x,y);
   }
   endShape();
-}*/
+}
+
+/*
+function displayBuffer(buffer) {
+   var leftChannel = buff.getChannelData(0); 
+   leftChannel.length
+
+
+function drawDots(volhistory){
+  stroke(0, 150, 50);
+  for(var i = 0; i<360; i++) {
+    var r = map(volhistory[i], 0, 0.6, 240, 340);
+    var x = r * cos(i);
+    var y = r * sin(i);
+    point(x,y);
+  }
+}
+*/
