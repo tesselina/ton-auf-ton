@@ -9,19 +9,23 @@ var volhistory = [];
 
 var filePath = "assets/";
 var fileInput;
-
-
+var step = 0.1;
+var count = 0;
+var rad = 500;
+var theta = 0;
+var a = 0;
+var r = 500;
 
 function setup() {
   // put setup code here
-  frameRate(60);
+  frameRate(100);
   createCanvas(1024, 1024);
   angleMode(DEGREES);
   fft = new p5.FFT();
   amp = new p5.Amplitude();
   playButton = document.getElementById("playButton");
   fileInput = document.forms[0].soundFileSelect; 
-  fileInput.addEventListener("change", action);
+  fileInput.addEventListener("change", getUrl);
 }
 
 
@@ -31,12 +35,14 @@ function getFileName(){
   }
 }
 
-function action(){
-  var url = filePath + fileInput.files[0].name;
-  loadSound(url);
+function getUrl(){
+  if (fileInput.files.length > 0 && ["audio/mpeg", "audio/mp3", "audio/x-wav"].includes(fileInput.files[0].type)) {
+    var url = filePath + fileInput.files[0].name;
+    loadMusic(url);
+  }
 }
 
-function loadSound(url) {   
+function loadMusic(url) { 
     var req = new XMLHttpRequest();
     req.open( "GET", url, true );
     req.responseType = "arraybuffer";    
@@ -47,6 +53,7 @@ function loadSound(url) {
                     function(buffer) {
                              currentAudioBuffer = buffer;
                              displayBuffer(buffer);
+                             
                     }, onDecodeError);
              else
                   alert('error during the load.Wrong url or cross origin issue');
@@ -59,14 +66,14 @@ function onDecodeError() {  alert('error while decoding your file.');  }
 
 
 function displayBuffer(buffer){
-  console.log('buffer', buffer, buffer.getChannelData(0));
+  var channel = buffer.getChannelData(0);
+  console.log('buffer',channel);
 };
 
 function draw() {
   visualize();
 
  if(getFileName() && fileState == false){
-   console.log('file selected draw');
     fileState = true; 
     song = new p5.SoundFile('assets/'+ getFileName(),loaded);
   }
@@ -98,30 +105,26 @@ setInterval(function(){
 
 
 function visualize(){
-  background(240);
-  var vol = amp.getLevel();
-  var waveform = fft.waveform();
-
-  volhistory.push(vol);
-  strokeWeight(1);
-  //drawSpiral(volhistory);
-  //drawDots(volhistory);
-  drawWaveform(waveform);
-
-  stroke(0);
   noFill();
-  beginShape();
-  for(var i = 0; i<volhistory.length; i++) {
-    var y = map(volhistory[i], 0, 1, height, 0);
-    vertex(i,y);
-  }
-  endShape();
+  strokeWeight(1);
+  translate(width/2, height/2);
 
-  if(volhistory.length > 360) {
-    volhistory.splice(0,1);
+  stroke(255,0,0);
+  ellipse(0, 0, 1020, 1020);
+
+
+
+
+
+  //background(240);
+  //fill("white");
+
+  if (currentAudioBuffer){
+    drawSpiral(currentAudioBuffer.getChannelData(0));
   }
+
 }
-
+/*
 function drawSpiral(volhistory){
   stroke(0);
   noFill();
@@ -137,33 +140,58 @@ function drawSpiral(volhistory){
   endShape();
 
 }
+*/
 
-function drawWaveform(waveform){
-  noFill();
-  beginShape();
-  stroke(255,0,0); // waveform is red
-  //strokeWeight(1);
-  for (var i = 0; i< waveform.length; i++){
-    var x = map(i, 0, waveform.length, 0, width);
-    var y = map( waveform[i], -1, 1, 0, height);
-    vertex(x,y);
+
+//umfang = PI*durchmesser / PI*2*r
+
+
+function drawSpiral(channel){
+//step +=0.00011538;
+  if(r>0){
+    for(var i = 0; i<59; i++) {
+      var x = r * cos(theta);
+      var y = r * sin(theta);
+      theta += step;
+      r -= 0.00555555555;
+
+      stroke(0);
+      point(x,y);
+    }
   }
-  endShape();
 }
+
+/*  stroke(255,0,0); 
+
+
+  var step = 0.1;
+  for(var i = 0; i<441; i++) {
+    var val = channel[count*441+ i];
+   if (i%360 >=step){
+      console.log(i, step);
+    }
+    //console.log(count);
+    //var r = rad + map(channel[i], -1, 1, -10, 10);
+    var r = rad - 0.00555555555;
+    var x = r * cos(theta);
+    var y = r * sin(theta);
+    point(x,y);
+  //}
+  //endShape();
+ // pop();
+  theta += step;
+  if (theta >=360){
+    theta = 0;
+  }
+  //rad -= 0.15;
+
+}
+count+=1;*/
+
 
 /*
 function displayBuffer(buffer) {
    var leftChannel = buff.getChannelData(0); 
    leftChannel.length
 
-
-function drawDots(volhistory){
-  stroke(0, 150, 50);
-  for(var i = 0; i<360; i++) {
-    var r = map(volhistory[i], 0, 0.6, 240, 340);
-    var x = r * cos(i);
-    var y = r * sin(i);
-    point(x,y);
-  }
-}
 */
