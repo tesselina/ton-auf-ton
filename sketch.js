@@ -9,7 +9,7 @@ var volhistory = [];
 
 var filePath = "assets/";
 var fileInput;
-var step = 0.1;
+var step = 0.2;
 var count = 0;
 var rad = 500;
 var theta = 0;
@@ -120,7 +120,7 @@ function visualize(){
   //fill("white");
 
   if (currentAudioBuffer){
-    drawSpiral(currentAudioBuffer.getChannelData(0));
+    drawSpiral(currentAudioBuffer);
   }
 
 }
@@ -146,14 +146,19 @@ function drawSpiral(volhistory){
 //umfang = PI*durchmesser / PI*2*r
 
 
-function drawSpiral(channel){
-//step +=0.00011538;
-  if(r>0){
-    for(var i = 0; i<59; i++) {
+function drawSpiral(buffer){
+  var channel = currentAudioBuffer.getChannelData(0);
+var secs = channel.length/22050;
+
+  if(r>0 && step <= 0.5 ){
+    for(var i = 0; i<441; i++) {
+      var val = channel[count*+ i];
       var x = r * cos(theta);
       var y = r * sin(theta);
       theta += step;
-      r -= 0.00555555555;
+      
+      step = 360/(2*r*PI);
+      r -= step/18; 
 
       stroke(0);
       point(x,y);
