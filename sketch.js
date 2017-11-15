@@ -147,14 +147,15 @@ function drawSpiral(volhistory){
 
 
 function drawSpiral(buffer){
-  var channel = currentAudioBuffer.getChannelData(0);
-var secs = channel.length/22050;
+  var channel = buffer.getChannelData(0);
+  var secs = channel.length/buffer.sampleRate;
 
-  if(r>0 && step <= 0.5 ){
+  if(r>0 || step <= 0.5 ){
     for(var i = 0; i<441; i++) {
-      var val = channel[count*+ i];
-      var x = r * cos(theta);
-      var y = r * sin(theta);
+      var val = channel[count*441 + i];
+      var rad = r + map(val, -1, 1, -50, 50);
+      var x = rad * cos(theta);
+      var y = rad * sin(theta);
       theta += step;
       
       step = 360/(2*r*PI);
@@ -163,40 +164,6 @@ var secs = channel.length/22050;
       stroke(0);
       point(x,y);
     }
+    count += 1;
   }
 }
-
-/*  stroke(255,0,0); 
-
-
-  var step = 0.1;
-  for(var i = 0; i<441; i++) {
-    var val = channel[count*441+ i];
-   if (i%360 >=step){
-      console.log(i, step);
-    }
-    //console.log(count);
-    //var r = rad + map(channel[i], -1, 1, -10, 10);
-    var r = rad - 0.00555555555;
-    var x = r * cos(theta);
-    var y = r * sin(theta);
-    point(x,y);
-  //}
-  //endShape();
- // pop();
-  theta += step;
-  if (theta >=360){
-    theta = 0;
-  }
-  //rad -= 0.15;
-
-}
-count+=1;*/
-
-
-/*
-function displayBuffer(buffer) {
-   var leftChannel = buff.getChannelData(0); 
-   leftChannel.length
-
-*/
