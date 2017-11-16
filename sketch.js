@@ -1,31 +1,34 @@
 var song;
-var amp;
-var button;
-var fft;
+// var amp;
+// var fft;
 var fileState = false;
 var currentAudioBuffer  = null;
 
-var volhistory = [];
 
 var filePath = "assets/";
 var fileInput;
 var step = 0.2;
 var count = 0;
-var rad = 500;
+var scount = 0;
 var theta = 0;
 var a = 0;
 var r = 500;
+var fRate = 100;
+var sampleFraction;
+var canvas;
 
 function setup() {
   // put setup code here
-  frameRate(100);
-  createCanvas(1024, 1024);
+  frameRate(fRate);
+  canvas = createCanvas(1024, 1024);
+  canvas.id("plate");
   angleMode(DEGREES);
-  fft = new p5.FFT();
-  amp = new p5.Amplitude();
+  // fft = new p5.FFT();
+  // amp = new p5.Amplitude();
   playButton = document.getElementById("playButton");
   fileInput = document.forms[0].soundFileSelect; 
   fileInput.addEventListener("change", getUrl);
+  drawDisc();
 }
 
 
@@ -70,8 +73,24 @@ function displayBuffer(buffer){
   console.log('buffer',channel);
 };
 
+function drawDisc(){
+  fill("#f2efea");
+  strokeWeight(0);
+  push();
+  translate(width/2, height/2);
+  //stroke(85,110,137); //#556e89
+  ellipse(0, 0, 1020, 1020);
+  pop();
+}
+
 function draw() {
-  visualize();
+  strokeWeight(1);
+  translate(width/2, height/2);
+  
+
+  if (currentAudioBuffer){
+    drawSpiral(currentAudioBuffer);
+  }
 
  if(getFileName() && fileState == false){
     fileState = true; 
@@ -96,73 +115,33 @@ function toggleSong(){
 }
 
 setInterval(function(){ 
-
-      //console.log('file selected?', getFileName());
+console.log('sample count', scount);
   //console.log("wave",  normalArray);
-}, 3000);
-
-
-
-
-function visualize(){
-  noFill();
-  strokeWeight(1);
-  translate(width/2, height/2);
-
-  stroke(255,0,0);
-  ellipse(0, 0, 1020, 1020);
-
-
-
-
-
-  //background(240);
-  //fill("white");
-
-  if (currentAudioBuffer){
-    drawSpiral(currentAudioBuffer);
-  }
-
-}
-/*
-function drawSpiral(volhistory){
-  stroke(0);
-  noFill();
-
-  translate(width/2, height/2);
-  beginShape();
-  for(var i = 0; i<360; i++) {
-    var r = map(volhistory[i], 0, 1, 240, 340);
-    var x = r * cos(i);
-    var y = r * sin(i);
-    vertex(x,y);
-  }
-  endShape();
-
-}
-*/
-
+}, 1000);
 
 //umfang = PI*durchmesser / PI*2*r
 
 
 function drawSpiral(buffer){
+  sampleFraction = buffer.sampleRate/fRate;
+  console.log('frac', sampleFraction, buffer.sampleRate, fRate );
   var channel = buffer.getChannelData(0);
   var secs = channel.length/buffer.sampleRate;
 
-  if(r>0 || step <= 0.5 ){
-    for(var i = 0; i<441; i++) {
-      var val = channel[count*441 + i];
-      var rad = r + map(val, -1, 1, -50, 50);
+  if(r>0 && step <= 0.5 ){
+    for(var i = 0; i<sampleFraction; i++) {
+      var val = channel[count*sampleFraction + i];
+      var rad = r + map(val, -1, 1, -1000, 1000);
       var x = rad * cos(theta);
       var y = rad * sin(theta);
       theta += step;
       
-      step = 360/(2*r*PI);
+      step = 360/(2*r*PI*30);
       r -= step/18; 
 
       stroke(0);
       point(x,y);
+      scount += 1;
     }
     count += 1;
   }
