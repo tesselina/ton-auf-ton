@@ -24,18 +24,21 @@ const WavDecoder = require("wav-decoder");
 
 
 function clientConnection (socket){
-  socket.on('selection', decodeWav);
+  socket.on('selection', function(data){
+    decodeWav(data, socket);
+  });
     console.log('client connection: ', socket.id);
 }
 
-function decodeWav(data){
-  if(data){
+function decodeWav(data, socket){
     read(data).then((buffer) => {
       return WavDecoder.decode(buffer);
     }).then(function(audioData) {
-        console.log('decodeWav',audioData.sampleRate);
-      //console.log(audioData.channelData[0].length); // Float32Array
+      //by sending float32array to client it becomes an object. 
+      //to keep that from happening we only send the buffer and 
+      //create new float32array on client
+        socket.emit('decodedAudioBuffer', audioData.channelData[0].buffer); 
+        //console.log(audioData.channelData[0]); // Float32Array
     
     });
-  }
 }
