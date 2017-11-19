@@ -19,8 +19,8 @@ var io = require('socket.io')(server);
 io.on('connection', clientConnection);
 
 var board = require('./server/board');
-var decoder = require('./server/decoder');
-
+var read = require('./server/fileReader');
+const WavDecoder = require("wav-decoder");
 
 
 function clientConnection (socket){
@@ -29,5 +29,13 @@ function clientConnection (socket){
 }
 
 function decodeWav(data){
-console.log('decodeWav', data);
+  if(data){
+    read(data).then((buffer) => {
+      return WavDecoder.decode(buffer);
+    }).then(function(audioData) {
+        console.log('decodeWav',audioData.sampleRate);
+      //console.log(audioData.channelData[0].length); // Float32Array
+    
+    });
+  }
 }
