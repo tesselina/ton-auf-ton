@@ -24,5 +24,10 @@ var decoder = require('./server/decoder');
 
 
 function clientConnection (socket){
+  socket.on('selection', decodeWav);
     console.log('client connection: ', socket.id);
+}
+
+function decodeWav(data){
+console.log('decodeWav', data);
 }
