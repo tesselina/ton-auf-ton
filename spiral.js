@@ -5,24 +5,25 @@ var er = 12.75; //end radius
 var ad = 0.5; //distance between spiral arms
 var pxPerCm = 40;
 var turns = (sr-er)/ad; //turn count of the spiral
+var totalRadians; //radian count of turns 
 var r;
 
 var currentAudioBuffer  = null;
 
 
-function spiralEquation(startRadius, armDistance, radian){
+function spiralEquationInToOut(startRadius, armDistance, radian){
   var step = armDistance/(2*PI);
   var rad = startRadius + step*radian;
   return rad;
 }
 
-
 function setup() {
   // put setup code here
   frameRate(60);
   createCanvas(1050, 1050);
+  loadMusic("assets/abtast.wav");
   noLoop();
-  loadMusic("assets/8000.wav");
+  totalRadians = turns*2*PI; //radian count of turns 
 }
 
 function draw() {
@@ -34,27 +35,28 @@ function draw() {
 
   if (currentAudioBuffer){
     var channel = currentAudioBuffer.getChannelData(0);
-    for(var i = 0; i< (39*PI); i+=(PI/180)) {
+    for(var i = 0; i< -totalRadians; i+=(PI/180)) {
       var count = Math.floor(i * 180/PI);
-      console.log(count);
-      r = spiralEquation(sr*pxPerCm, ad*pxPerCm, i);
-      var rad = r + map(channel[count], -1, 1, -500, 500);
+      r = spiralEquationInToOut(sr*pxPerCm, ad*pxPerCm, i);
+      var rad = r + map(channel[channel.length-count], -1, 1, -50, 50);
       var x = rad * cos(i);
       var y = rad * sin(i);
       point(x,y);
     }
+    console.log('buffer',currentAudioBuffer, channel);
 
   } else {
     beginShape();
-    for(var i = 0; i< (39*PI); i+=(PI/180)) {
+    for(var i = 0; i< -totalRadians; i+=(PI/180)) {
 
-      var r = spiralEquation(sr*pxPerCm, ad*pxPerCm, i);
+      var r = spiralEquationInToOut(sr*pxPerCm, ad*pxPerCm, i);
       var x = r * cos(i);
       var y = r * sin(i);
       vertex(x,y);
     }
     endShape();
   }
+  noLoop();
 }
 
 function loadMusic(url) { 
@@ -63,12 +65,14 @@ function loadMusic(url) {
     req.responseType = "arraybuffer";    
     req.onreadystatechange = function (e) {
           if (req.readyState == 4) {
-             if(req.status == 200)
+             if(req.status == 200){
+                  console.log("response", req.response);
                   getAudioContext().decodeAudioData(req.response, 
                     function(buffer) {
                              currentAudioBuffer = buffer;
                              loop();
                     }, onDecodeError);
+                  }
              else
                   alert('error during the load.Wrong url or cross origin issue');
           }
