@@ -1,0 +1,46 @@
+<!--
+ @author    Tesselina Spaeth <tesselina.spaeth@hs-augsburg.de>
+ @copyright 2017
+ @license   CC-BY-NC-SA-4.0
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta name="viewport" width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0>
+    <title>Ton auf Ton</title>
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+
+    <script src="dist/jquery.min.js"></script>
+
+    <script src="client/lib/p5.min.js"></script>
+    <script src="client/lib/addons/p5.dom.min.js"></script>
+    <script src="client/lib/addons/p5.sound.min.js"></script>
+    <script src="client/sketch.js"></script>
+
+    <!-- <link rel="stylesheet" type="text/css" href="css/style.css"> -->
+</head>
+
+<body>
+    <form id="playerForm">
+        <h1>Ton auf Ton</h1>
+        Wähle ein mp3 File aus dem assets Ordner aus. 
+        <div class="box">
+          <div class="fileUpload button">
+            <span>Audio hochladen</span>
+            <input type="file" id="soundFileSelect"  class="upload" />
+          </div>
+          <input type="button" id="playButton" value="Play" /> 
+        </div>
+    </form>
+
+
+
+
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>var socket = io();</script>
+    <!-- io.connect('http://localhost:3000') -->
+</body>
+
+</html>

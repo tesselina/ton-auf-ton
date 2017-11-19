@@ -7,8 +7,9 @@ var pxPerCm = 40;
 var turns = (sr-er)/ad; //turn count of the spiral
 var totalRadians; //radian count of turns 
 var r;
-
+var path = "../public/assets/";
 var currentAudioBuffer  = null;
+var fRate = 100;
 
 
 function spiralEquationInToOut(startRadius, armDistance, radian){
@@ -19,19 +20,24 @@ function spiralEquationInToOut(startRadius, armDistance, radian){
 
 function setup() {
   // put setup code here
-  frameRate(60);
-  createCanvas(1050, 1050);
-  loadMusic("assets/abtast.wav");
+  frameRate(fRate);
+  canvas = createCanvas(1024, 1024);
+  canvas.id("plate");
+  loadMusic(path + "abtast.wav");
   noLoop();
   totalRadians = turns*2*PI; //radian count of turns 
 }
 
 function draw() {
-  background(240);
+  translate(width/2, height/2);
+  fill(255);
+  strokeWeight(0);
+  //stroke(85,110,137); //#556e89
+  ellipse(0, 0, 1024, 1024);
+
   strokeWeight(1);
   stroke(0);
   noFill();
-  translate(width/2, height/2);
 
   if (currentAudioBuffer){
     var channel = currentAudioBuffer.getChannelData(0);
@@ -43,7 +49,7 @@ function draw() {
       var y = rad * sin(i);
       point(x,y);
     }
-    console.log('buffer',currentAudioBuffer, channel);
+    //console.log('buffer',currentAudioBuffer, channel);
 
   } else {
     beginShape();
@@ -66,7 +72,7 @@ function loadMusic(url) {
     req.onreadystatechange = function (e) {
           if (req.readyState == 4) {
              if(req.status == 200){
-                  console.log("response", req.response);
+                  //console.log("response", req.response);
                   getAudioContext().decodeAudioData(req.response, 
                     function(buffer) {
                              currentAudioBuffer = buffer;
