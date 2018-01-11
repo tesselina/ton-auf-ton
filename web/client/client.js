@@ -12,8 +12,6 @@ function getFileName(){
     if (fileInput.files.length > 0 && ["audio/mpeg", "audio/mp3", "audio/x-wav"].includes(fileInput.files[0].type)) {
       var fileName = fileInput.files[0].name;
       socket.emit('selection', fileName);
-      console.log('filename', fileName);
-      //loadMusic(url);
     }
   }
   
