@@ -4,9 +4,13 @@
  * @license   CC-BY-NC-SA-4.0
  */
 
+
+const WavDecoder = require("wav-decoder");
 const fs = require("fs");
 const path = require("path");
 const fileDir = "/public/assets/";
+var Listener = require('./listener');
+var listener = new Listener();
 
 function readFile(fileName){
   var url = path.join(path.dirname(__dirname), fileDir, fileName);
@@ -20,4 +24,17 @@ function readFile(fileName){
   });
 };
 
-module.exports = readFile;
+
+function getSamplesFromWavFile(filename){
+  readFile(filename).then((buffer) => {
+    return WavDecoder.decode(buffer);
+  }).then(function(audioData) {
+    listener.finishedDecoding(audioData.channelData[0]);
+    return audioData.channelData[0];
+  });
+}
+
+module.exports = {
+  getSamplesFromWavFile,
+  listener
+};
