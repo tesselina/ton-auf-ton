@@ -13,9 +13,14 @@ var gcode = [];
   
 
 function writeGcode(samples){
-  console.log('write gcode', samples);
-  //calculate(samples);
-  gcode.push("G0 L"+ samples.length);
+  console.log('gcode',    
+  calculate.getSpiralCircumference(),
+  calculate.getCircumferencePerSample(samples.length),
+  calculate.getRadius(samples.length, 120),
+  calculate.getTheta(samples.length, 120)
+);
+
+  /*gcode.push("G0 L"+ samples.length);
   samples.forEach(function(val, index, array) {
     gcode.push("G1 W"+val.toFixed(7)+ " I"+index);
   });
@@ -25,7 +30,7 @@ function writeGcode(samples){
   return gcode; 
  } else{
   return new Error('Gcode wasn`t successfully generated.');
- }
+ }*/
 }
 
   module.exports = {
@@ -33,5 +38,3 @@ function writeGcode(samples){
     listener
   };
 
-
-  //condition ? expr1 : expr2 
