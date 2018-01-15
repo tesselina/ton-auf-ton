@@ -17,7 +17,6 @@ URL:https://www.intmath.com/blog/mathematics/length-of-an-archimedean-spiral-659
 const outerRadius =  132.5;
 const innerRadius = 30.0;
 const spiralDistance = 5; //distance between spiral arms
-
 const difference = outerRadius -innerRadius; // 102.5 mm
 const turns = difference/spiralDistance;  //20.5;
 const turnsInRadians = turns * 2 * Math.PI; // = 41*PI = 128.805298797;
@@ -59,13 +58,15 @@ function F(a, b, theta){ //a is inner radius of spiral, b is multiplicator
   
 }
 
+const spiralCircumference = getSpiralCircumference();
+
 
 /* 
 To get an even seperation of sample information on the everchanging radius, 
 I calculate the length of the section of circumference each sample should get. 
 */
 function getCircumferencePerSample(samplesCount){ //10655
-return getSpiralCircumference(innerRadius, multiplicator, turnsInRadians)/ samplesCount; //-> 10466.021510/50000 ~ 21/100 ~ 0.21 mm  ~ umfang 10500 mm
+return spiralCircumference/ samplesCount; //-> 10466.021510/50000 ~ 21/100 ~ 0.21 mm  ~ umfang 10500 mm
 }
 
 
@@ -100,10 +101,68 @@ function getRadius(samplesCount, oldRadius){
   return (oldRadius- multiplicator * getTheta(samplesCount, oldRadius)); //+ samplevalue; 
 }
 
+
+/*Further Calculation towards stepper motor steps 
+could be solved differently by sending a request 
+to the arduino and get the data directly from there
+*/
+
+const steps = {
+  w: 200,
+  p: 200
+}
+const microsteps = {
+  w: 32,
+  p: 32
+}
+
+const stepsPerMm = (steps.w * microsteps.w)/32; //pulley has 16 teeth which means 32mm per rotation
+//1mm/stepsPerMm = distance per step ( 1step = 0.01 mm) 
+
+
+const plateTransmission = 16.625; // 266/16 gear to pulley
+const totalSteps = {
+  w: stepsPerMm * difference, //steps per mm multiplied by the distance covered
+  p: turns* plateTransmission * steps.p * microsteps.p 
+}
+
+/*
+transforming radius in steps and new coordinate system where starting point of cuttin process is 0 
+mapToRange function was used from:
+
+Title: Javascript Map range of number to another range
+Author : xposedbones
+Institution: Github, Inc. 
+URL:  https://gist.github.com/xposedbones/75ebaef3c10060a3ee3b246166caab56
+Date: 26 Sep 2016
+*/
+function mapToRange(val, in_min, in_max, out_min, out_max) {
+  return (val - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
+const range = stepsPerMm * spiralDistance;
+
+function sampleValueToSteps (val){
+  return mapToRange(val, -1,1,0, range);
+
+}
+
+function getWPos(radius, val){
+  return (outerRadius - radius)* stepsPerMm + sampleValueToSteps(val);
+}
+
+  //turnsInRadians -> totalSteps.p
+  //128.805298797  ->  2181200 
+function getPPos(theta){
+  return (theta/turnsInRadians) * totalSteps.p;
+}
+
+  
+
 module.exports = {
-  //spiralRadius,
-  getSpiralCircumference,
-  getCircumferencePerSample,
+  outerRadius,
+  getWPos,
+  getPPos,
   getRadius,
   getTheta
 };
