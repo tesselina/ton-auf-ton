@@ -1,6 +1,6 @@
 /** 
  * @author    Tesselina Spaeth <tesselina.spaeth@hs-augsburg.de>
- * @copyright 2017
+ * @copyright 2018
  * @license   CC-BY-NC-SA-4.0
  */
 //https://github.com/damellis/gctrl/blob/master/gctrl.pde#L34
@@ -15,7 +15,7 @@ var express = require('express');
 var app = express();
 
 var server = app.listen(3000, () => {
-  console.log("running local sever on port 3000 ");
+  console.log("Server: 3000 ");
 });
 
 app.use(express.static('node_modules/jquery'));
@@ -27,12 +27,21 @@ io.on('connection', clientConnection);
 
 var transform = require('./server/transform');
 var decode = require('./server/decode');
-var port = require('./server/stream');
+var portListener = require('./server/stream');
+
 
 
 
 function clientConnection (socket){
-  console.log('Client connected. ID: ', socket.id);
+
+  portListener.on('arduinoConnected', function (state, port) {
+    console.log('client-arduino-connection', state);
+     socket.emit('arduinoConnected', state);
+  
+  });
+
+
+  console.log('Client: ', socket.id);
 
   socket.on('selection', function(data){
     decode.getSamplesFromWavFile(data);
@@ -46,3 +55,7 @@ function clientConnection (socket){
   });
 
 }
+
+
+// serialPort.pause() 
+ //serialPort.resume() 

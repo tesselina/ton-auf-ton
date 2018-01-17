@@ -2,73 +2,55 @@
  * @author    Tesselina Spaeth <tesselina.spaeth@hs-augsburg.de>
  * @copyright 2018
  * @license   CC-BY-NC-SA-4.0
+ * 
+ * Part of this code, especially the function 'stream', is based on following source 
+ * and was adapted to suit my application. 
+ * 
+ * Title: Processing GUI for grbl
+ * Author: David A. Mellis
+ * Institution: Github, Inc.
+ * Date: 2 Aug 2013
+ * Url: https://github.com/damellis/gctrl/blob/master/gctrl.pde
+ * 
+ * "A simple Processing <http://processing.org/> sketch that acts as an
+ * interface to grbl <http://dank.bengler.no/-/page/show/5470_grbl>."
  */
 
-var Listener = require('./listener');
 var transform = require('./transform');
+var Listener = require('./listener');
+var listener = new Listener();
 
-const usbDetect = require('usb-detection');
 const SerialPort = require('serialport');
 const Readline = SerialPort.parsers.Readline;
 var port = {};
 var parser;
 
-port.listener = new Listener();
-
 var streaming = false;
 var gcode = [];
 var i = 0;
 
+var serialNumber = 'A4131363139351B041C2'; //is the serial number of the specific arduino used 
+
+/**
+ * First the connected ports are listed and checked whether the arduino is connected, then a timeout
+ * of 4 secs waits for client to be connected before handling the serial port, passing the specific com path */
+
 SerialPort.list(function (err, ports) {
-  ports.forEach(function(port) {
-    console.log('list', port);
-  });
+  var arduino = ports.find(function (obj) { return obj.serialNumber === serialNumber ; });
+  arduino ? setTimeout(handlePort, 4000, arduino.comName) : setTimeout(handlePort, 4000, 'none');
 });
 
 
-const ports = [{
-  locationId: 339738624, 
-  path: '/dev/cu.usbmodem1441' //left upper port
-  },{
-  locationId: 341835776,
-  path: '/dev/cu.usbmodem1461' //left lower port
-  },{
-  locationId: 336592896,
-  path: '/dev/cu.usbmodem1411' //right upper port
-  },{
-  locationId: 340787200, 
-  path: '/dev/cu.usbmodem1451' //right lower port
-  }  
-];
+/** The 'handlePort' function opens a serial port on given path, creates a parser to read incoming data by 'line',
+ *  and manages all port and parser events */
 
-//usbDetect.stopMonitoring(); //remove or change event
-usbDetect.startMonitoring();
- //vid: restrict search to a certain vendor id -> add:vid filtered by vendor id 
-
- usbDetect.on('remove:9025', function(device) {
-   //if(port && port.isOpen) port.close(function(err){ console.log('close port', err)});
- });
-
- usbDetect.on('add:9025', function(device) {
-   var usb = ports.find(function (obj) { return obj.locationId === device.locationId ; });
-   handlePort(usb);
- });
-
-usbDetect.find(9025, function(err, devices) { 
-  //if (devices.length >0) port.listener.arduinoConnected(devices[0].locationId);
-}).then(function(device){
-  return  ports.find(function (obj) { return obj.locationId === device[0].locationId ; });
-}).then(function(usb){
-  handlePort(usb);
-});
-
-
-function handlePort(usb){
-  port = new SerialPort(usb.path, { 
+function handlePort(path){
+  port = new SerialPort(path, { 
     baudRate: 9600
-  }, function (err) {
+  }, function(err) {
     if (err) {
-      return console.log('Error on open: ', err.message);
+    listener.arduinoConnected(false);
+    console.log("Maschine konnte nicht verbunden werden.");
     }
   });
   parser = port.pipe(new Readline({ delimiter: '\r\n' }));
@@ -76,29 +58,26 @@ function handlePort(usb){
   parser.on('data', function (data) { //waits for feedback from arduino 
     console.log('Serial: ', data);
     if (data.trim().startsWith("ok")) stream();
-        //if (data.trim().startsWith("TON")) port.listener.arduinoConnected();
   }); 
 
-
   port.on('open', function() {
+    listener.arduinoConnected(true, port);
     console.log('Die Maschine ist nun verbunden.');
   });
   port.on('close', function(err) {
+    listener.arduinoConnected(false);
     console.log("Die Verbindung zur Maschine wurde getrennt.");
-  });
-  port.on('error', function(err) {
-    console.log("Maschine konnte nicht verbunden werden.");
   });
 }
 
-
-
-
-
-
+/**
+ * When gcodeReady event is emitted, the streaming variable is set to true
+ * and the entire gcode is passed to the local gcode variable. 
+ * Every 'write' follows an answer 'ok' from the arduino, which causes 'stream' 
+ * to execute another time, an index keeps track of the gcode array.
+ */
 
 function stream(){
-  //console.log('stream', gcode[1]);
   if (!streaming) return;
   while (true) {
     if (i == gcode.length) {
@@ -109,7 +88,6 @@ function stream(){
     if (gcode[i].trim().length == 0) i++;
     else break;
   }
-  //console.log('stream', gcode[i], i);
   port.write(gcode[i] + '\n', function(err) {
     if (err) {
       return console.log('Error on write: ', err.message);
@@ -125,4 +103,7 @@ transform.listener.on('gcodeReady', function (code) {
   stream();
 });
 
- module.exports = port;
+/** listener contains the 'arduinoConnected' event which is used in init.js 
+ * to help interact with websocket */
+
+ module.exports = listener;

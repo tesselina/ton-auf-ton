@@ -1,6 +1,6 @@
 /** 
  * @author    Tesselina Spaeth <tesselina.spaeth@hs-augsburg.de>
- * @copyright 2017
+ * @copyright 2018
  * @license   CC-BY-NC-SA-4.0
  */
 
@@ -17,7 +17,6 @@ util.inherits(Listener, EventEmitter);
 
 
 Listener.prototype.finishedDecoding = function (samples) {
-    console.log('listener finished called');
     this.emit('finishedDecoding', samples);
 };
 
@@ -26,5 +25,8 @@ Listener.prototype.gcodeReady = function (gcode) {
     this.emit('gcodeReady', gcode);
 };
 
+Listener.prototype.arduinoConnected = function (bool, port) {
+    this.emit('arduinoConnected', bool, port);
+};
 
 module.exports = Listener;

@@ -1,6 +1,6 @@
 /** 
  * @author    Tesselina Spaeth <tesselina.spaeth@hs-augsburg.de>
- * @copyright 2017
+ * @copyright 2018
  * @license   CC-BY-NC-SA-4.0
  */
 
