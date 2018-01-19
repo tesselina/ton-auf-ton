@@ -15,20 +15,20 @@ struct vector stepsPerRevolution = {200, 200};
 
 /* 
 Set microsteps with jumper
-MODE0 MODE1	MODE2   Microstep Resolution
-Low	Low	Low	        Full step
-High Low Low    	Half step
-Low	High Low    	1/4 step
-High High Low   	1/8 step
-Low	Low	High    	1/16 step
-High Low High   	1/32 step
-Low	High High	    1/32 step
-High High High  	1/32 step */
+MODE0 MODE1  MODE2   Microstep Resolution
+Low Low Low         Full step
+High Low Low      Half step
+Low High Low      1/4 step
+High High Low     1/8 step
+Low Low High      1/16 step
+High Low High     1/32 step
+Low High High     1/32 step
+High High High    1/32 step */
 struct vector microSteps = {32, 32};
 
 // Initialize steppers for wave and plate control using Dir end Step Pins on the Arduino and the DRV8825 stepper driver
-Stepper stepperPlate(stepsPerRevolution.p * microSteps.p, 3,4);            
-Stepper stepperWaves(stepsPerRevolution.w * microSteps.w, 8,9);  
+Stepper stepperPlate(stepsPerRevolution.p * microSteps.p, 8,9);            
+Stepper stepperWaves(stepsPerRevolution.w * microSteps.w, 3,4);  
 
 // Current position of plothead
 struct vector actuatorPos;
