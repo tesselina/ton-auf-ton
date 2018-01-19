@@ -9,8 +9,10 @@ var spiralStruct = null;
 
 function setup() {
   // put setup code here
-  canvas = createCanvas(800, 800);
+  canvas = createCanvas(670, 670);
   canvas.id("plate");
+  canvas.parent('preview');
+  canvas.class("blue");
   noLoop();
 }
 
@@ -20,14 +22,10 @@ socket.on('decodedAudioBuffer', function(struct){
   });
 
 function draw() {
+  canvas.clear();
   translate(width/2, height/2);
-  fill(255);
-  strokeWeight(0);
-  //stroke(85,110,137); //#556e89
-  ellipse(0, 0, 800, 800);
-
   strokeWeight(1);
-  stroke(0);
+  stroke(255);
   noFill();
   if (spiralStruct){
     beginShape();

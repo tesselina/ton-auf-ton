@@ -11,35 +11,53 @@
     <title>Ton auf Ton</title>
     <link rel="stylesheet" type="text/css" href="css/main.css">
 
-    <script src="dist/jquery.min.js"></script>
+    <!-- <script src="dist/jquery.min.js"></script> -->
+    <!-- <script src="jquery-3.2.1.min.js"></script> -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
     <script src="client/lib/p5.min.js"></script>
     <script src="client/lib/addons/p5.dom.min.js"></script>
     <script src="client/lib/addons/p5.sound.min.js"></script>
-    <script src="client/sketch.js"></script>
 
     <!-- <link rel="stylesheet" type="text/css" href="css/style.css"> -->
 </head>
 
 <body>
-    <form id="playerForm">
+   <div id="header">
         <h1>Ton auf Ton</h1>
-        Wähle ein mp3 File aus dem assets Ordner aus. 
-        <div class="box">
-          <div class="fileUpload button">
-            <span>Audio hochladen</span>
-            <input type="file" id="soundFileSelect"  class="upload" />
-          </div>
-          <input type="button" id="playButton" value="Play" /> 
+        <div id ="arduino">
+                <div id="loader"></div>
         </div>
-    </form>
+   </div>
+    
+   <div id="control">
+       <p>Ton auf Ton ist eine Maschine, die es möglich macht Schall auf Keramik festzuhalten. Digitale Tonsequenzen von bis zu zehn Sekunden treffen auf handfesten Ton, auf dem sie eingraviert und verewigt werden. 
+        Wähle zunächst eine Tonsequenz aus und wenn dir die Vorschau gefällt beginne den Schreibprozess über Starten. </p>
+       <div class="mainButtonsBox">
+              <div id="fileUpload" class="button">
+                <span>Auswählen</span>
+                <input type="file" id="soundFileSelect"  class="upload" />
+              </div>
+            <input type="button" id="startButton" value="Starten" onClick="startStreaming()" disabled="true" /> 
+            <input type="button" id="toggleButton" onClick="toggleStreamingProcess()" value="Anhalten" style="display: none;"/> 
+        </div>
+        <div id="colorSelect">
+            <div class="circle blue" onClick="switchColor('blue')"></div>
+            <div class="circle red" onClick="switchColor('red')"></div>
+            <div class="circle grey" onClick="switchColor('grey')"></div>
+            <div class="circle green" onClick="switchColor('green')"></div>
+        </div>
 
+   </div>
+   <div id="preview">
+        <p id="fileInfo"></p>
+   </div>
+        
 
-
-
-    <script src="client/client.js"></script>
     <script src="/socket.io/socket.io.js"></script>
-    <script>var socket = io();</script>
+    <script>var socket = io('http://localhost:3000');</script>
+    <script src="client/client.js"></script>
+    <script src="client/sketch.js"></script>
     <!-- io.connect('http://localhost:3000') -->
 </body>
 

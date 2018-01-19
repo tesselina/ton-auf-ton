@@ -20,7 +20,7 @@ var gcode = [];
 var clientStruct = [];
 var oldRadius = calculate.outerRadius;
 var oldTheta = 0;
-var pxPerMmScale=2;
+var pxPerMmScale=2.5;
 
 samples.forEach(function(val, index, array) {
   /*calculating radius and theta:
