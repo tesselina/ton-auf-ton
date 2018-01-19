@@ -4,22 +4,17 @@
   "description": "Software for Ton auf Ton device, which uses arduino to carve sound waves into clay. Simple Interface for the project.",
   "main": "init.js",
   "dependencies": {
+    "events": "^1.1.1",
     "express": "^4.14.0",
     "fs": "0.0.1-security",
-    "http": "0.0.0",
-    "johnny-five": "^0.11.7",
-    "jquery": "^3.1.1",
     "path": "^0.12.7",
     "serialport": "^6.0.4",
     "socket.io": "^2.0.4",
+    "util": "file:node_modules/util",
     "wav-decoder": "^1.3.0"
   },
-  "devDependencies": {
-    "lite-server": "^2.2.2"
-  },
+  "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "lite": "lite-server -c conf/bs-config.json",
     "dev": "node ./web/init.js"
   },
   "repository": {},
