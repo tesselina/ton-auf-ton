@@ -27,7 +27,7 @@ var parser;
 
 var streaming = false;
 var gcode = [];
-var i = 0;
+var i;
 
 var serialNumber = 'A4131363139351B041C2'; //is the serial number of the specific arduino used 
 
@@ -37,7 +37,7 @@ var serialNumber = 'A4131363139351B041C2'; //is the serial number of the specifi
 
 SerialPort.list(function (err, ports) {
   var arduino = ports.find(function (obj) { return obj.serialNumber === serialNumber ; });
-  arduino ? setTimeout(handlePort, 4000, arduino.comName) : setTimeout(handlePort, 4000, 'none');
+  arduino ? setTimeout(handlePort, 5000, arduino.comName) : setTimeout(handlePort, 5000, 'none');
 });
 
 
@@ -45,28 +45,32 @@ SerialPort.list(function (err, ports) {
  *  and manages all port and parser events */
 
 function handlePort(path){
+  var msg;
   port = new SerialPort(path, { 
     baudRate: 9600
   }, function(err) {
     if (err) {
-    listener.arduinoConnected(false);
-    console.log("Maschine konnte nicht verbunden werden.");
+    msg = "Maschine konnte nicht verbunden werden.";
+    listener.arduinoConnected(false, msg);
+    console.log(msg);
     }
   });
   parser = port.pipe(new Readline({ delimiter: '\r\n' }));
 
   parser.on('data', function (data) { //waits for feedback from arduino 
-    console.log('Serial: ', data);
+    //console.log('Serial: ', data);
     if (data.trim().startsWith("ok")) stream();
   }); 
 
   port.on('open', function() {
-    listener.arduinoConnected(true, port);
-    console.log('Die Maschine ist nun verbunden.');
+    msg = 'Die Maschine ist nun verbunden.';
+    listener.arduinoConnected(true, msg, port);
+    console.log(msg);
   });
   port.on('close', function(err) {
-    listener.arduinoConnected(false);
-    console.log("Die Verbindung zur Maschine wurde getrennt.");
+    msg = "Die Verbindung zur Maschine wurde getrennt.";
+    listener.arduinoConnected(false, msg);
+    console.log(msg);
   });
 }
 
@@ -82,13 +86,17 @@ function stream(){
   while (true) {
     if (i == gcode.length) {
       streaming = false;
+      //console.log('streaming finished');
+      listener.streaming(false);
       gcode = [ ];
+      i = 0;
       return;
     }
     if (gcode[i].trim().length == 0) i++;
     else break;
   }
   port.write(gcode[i] + '\n', function(err) {
+    console.log('write', i);
     if (err) {
       return console.log('Error on write: ', err.message);
     }
@@ -97,9 +105,12 @@ function stream(){
 }
 
 transform.listener.on('gcodeReady', function (code) {
+  //console.log('started streaming');
   gcode = code;
   if (gcode == null) return;
   streaming = true;
+  i = 0;
+  listener.streaming(true);
   stream();
 });
 
