@@ -16,7 +16,7 @@ function setup() {
   noLoop();
 }
 
-socket.on('decodedAudioBuffer', function(struct){
+socket.on('spiralStruct', function(struct){
   spiralStruct = struct;
   loop();
   });

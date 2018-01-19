@@ -3,9 +3,7 @@
  * @copyright 2018
  * @license   CC-BY-NC-SA-4.0
  */
-//https://github.com/damellis/gctrl/blob/master/gctrl.pde#L34
-//https://github.com/node-serialport/node-serialport/blob/v6.0.4/README.md#module_serialport--SerialPort.parsers
-//http://www.airspayce.com/mikem/arduino/AccelStepper/classAccelStepper.html
+
 
 var Listener = require('./server/listener');
 var listener = new Listener();
@@ -27,35 +25,48 @@ io.on('connection', clientConnection);
 
 var transform = require('./server/transform');
 var decode = require('./server/decode');
-var portListener = require('./server/stream');
-
+var stream = require('./server/stream');
 
 
 
 function clientConnection (socket){
-
-  portListener.on('arduinoConnected', function (state, port) {
+/** 
+ * Upon correct serial connection, arduinoConnected is emitted and 
+ * passed onto client. Within the callback function of the listener, 
+ * we have access to the port and its pause and resume functions.
+ * */
+  stream.listener.on('arduinoConnected', function (state, msg, port) {
     console.log('client-arduino-connection', state);
-     socket.emit('arduinoConnected', state);
-  
+     socket.emit('arduinoConnected', state, msg);
+     socket.on('pause', function(state){
+      state ? port.pause() : port.resume(); 
+     });
   });
-
-
   console.log('Client: ', socket.id);
 
-  socket.on('selection', function(data){
-    decode.getSamplesFromWavFile(data);
-  });
-    
+  /** Ugly: This works only when soundfiles are located in the public/assets folder. 
+   * Upon Selection filename is passed to decode module which reads file and emits the 
+   * event 'finishedDecoding' passing an array of the sample information  */
 
+  socket.on('selection', function(fileName){
+    decode.getSamplesFromWavFile(fileName);
+  });
+  
   decode.listener.on('finishedDecoding', function (samples) {
-    //by sending float32array to client it becomes an object. so I only send the buffer and create new float32array on client
-    socket.emit('decodedAudioBuffer', samples.buffer); 
-    transform.writeGcode(samples);
+    /** transform returns and object containing the gcode for the arduino
+     *  and the sprial coordinates for the client preview */
+    transform(samples).then((obj) => {
+      socket.emit('spiralStruct', obj.clientStruct);
+
+      socket.on('stream', function(state){
+        state ? stream.start(obj.gcode) : console.log('couldnt start stream');
+       });
+    });
+  });
+
+  //whenever streaming variable is changed streaming event is triggered and passes variable to client
+  stream.listener.on('streaming', function (state) {
+    socket.emit('stream', state);
   });
 
 }
-
-
-// serialPort.pause() 
- //serialPort.resume() 

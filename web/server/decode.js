@@ -28,7 +28,7 @@ function readFile(fileName){
 function getSamplesFromWavFile(filename){
   readFile(filename).then((buffer) => {
     return WavDecoder.decode(buffer);
-  }).then(function(audioData) {
+  }).then((audioData) => {
     listener.finishedDecoding(audioData.channelData[0]);
     return audioData.channelData[0];
   });

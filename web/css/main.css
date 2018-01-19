@@ -5,23 +5,74 @@
   }
   
   html, body {
-      background: #f2efea; /* For browsers that do not support gradients */
+      background: white; /* For browsers that do not support gradients */
       height: 100%;
       font-family: 'NeatlyPrinted';
   }
   
   body {
-    margin: 0;
+      margin: 50px;
+  }
+
+  #header, #control, #preview {
+    margin: 0 auto;
+    width: 50%; 
+  }
+
+  #preview {
+      padding: 10px;
+      text-align: center;
+  }
+  #colorSelect{
+    padding: 0;
+    margin: 10px;
+}
+
+.mainButtonsBox{
+    padding: 0;
+    margin: 10px;
+}
+
+#colorSelect, .mainButtonsBox{
+    display: -webkit-flex; /* Safari */
+    -webkit-flex-direction: row; /* Safari 6.1+ */
     display: flex;
-  
-    /* This centers our sketch horizontally. */
-    /*justify-content: center;*/
-  
-    /* This centers our sketch vertically. */
-    /*align-items: center;*/
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+
+}
+
+#plate{
+    display: inline-block;
+    /* margin: 0 auto;
+    width: 670px;
+    height: 670px; */
+    border-radius: 50%;
+  }
+
+  .circle {
+    border-radius: 50%;
+    margin: 10px;
+    width: 20px;
+    height: 20px;
+    border: none;
+  }
+
+  .blue{
+      background: #6b77ba;
+  }
+  .red{
+      background:  #ce8575;
+  }
+  .grey{
+    background:  #585353;
+  }
+  .green{
+      background: #a1bdb2;
   }
   
-  
+
   #playerForm{
       padding: 10px;
       margin: 10px 20px;
@@ -30,25 +81,16 @@
       left: 10;
   
   }
-      #plate{
-          margin: 10px auto;
-      }
-  
-  .box{
-      padding: 0;
-      display: block;
-      margin: 0px;
-  }
   
   button, input, select, textarea {
     font-family : inherit;
     font-size   : 100%;
   }
   .button, input[type=button] {
-      background-color: #556e89; /* #dfe6ec */
+      background-color: #585353; /* #dfe6ec */
       border: none;
-      /*border: 1px solid #556e89;*/
       color: white;
+      cursor: pointer;
       margin: 10px;
       padding: 5px 10px;
       text-align: center;
@@ -57,23 +99,44 @@
       font-size: 16px;
       border-radius: 4px;
   }
-  
+
+  .button.disabled,
+  input[type=button]:disabled,
+  input[type=button][disabled]
+  {
+      background-color:#908b8b; /* #dfe6ec */
+      cursor: not-allowed;
+  }
+
   /*input[type=button], input.upload{*/
-  
-  
-  .fileUpload {
+
+  #fileUpload {
       position: relative;
       overflow: hidden;
       margin: 10px;
   }
-  .fileUpload input.upload {
+  #fileUpload input.upload {
       position: absolute;
+      cursor: pointer;
       top: 0;
       right: 0;
       margin: 0;
       padding: 0;
       font-size: 20px;
-      cursor: pointer;
       opacity: 0;
       filter: alpha(opacity=0);
   }
+
+  #loader {
+    border: 5px solid #908b8b; /* Light grey */
+    border-top: 5px solid #585353; /* Blue */
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

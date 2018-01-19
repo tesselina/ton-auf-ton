@@ -20,13 +20,12 @@ Listener.prototype.finishedDecoding = function (samples) {
     this.emit('finishedDecoding', samples);
 };
 
-
-Listener.prototype.gcodeReady = function (gcode) {
-    this.emit('gcodeReady', gcode);
+Listener.prototype.arduinoConnected = function (bool, msg, port) {
+    this.emit('arduinoConnected', bool, msg, port);
 };
 
-Listener.prototype.arduinoConnected = function (bool, port) {
-    this.emit('arduinoConnected', bool, port);
+Listener.prototype.streaming = function (bool) {
+    this.emit('streaming', bool);
 };
 
 module.exports = Listener;

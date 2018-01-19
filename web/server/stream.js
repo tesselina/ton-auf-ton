@@ -75,7 +75,7 @@ function handlePort(path){
 }
 
 /**
- * When gcodeReady event is emitted, the streaming variable is set to true
+ * When start function is called, the streaming variable is set to true
  * and the entire gcode is passed to the local gcode variable. 
  * Every 'write' follows an answer 'ok' from the arduino, which causes 'stream' 
  * to execute another time, an index keeps track of the gcode array.
@@ -104,17 +104,19 @@ function stream(){
   i++;
 }
 
-transform.listener.on('gcodeReady', function (code) {
-  //console.log('started streaming');
+function start(code){
   gcode = code;
   if (gcode == null) return;
   streaming = true;
   i = 0;
   listener.streaming(true);
   stream();
-});
+}
 
 /** listener contains the 'arduinoConnected' event which is used in init.js 
  * to help interact with websocket */
 
- module.exports = listener;
+ module.exports = {
+   listener,
+   start
+ };
