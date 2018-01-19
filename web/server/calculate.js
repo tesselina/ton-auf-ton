@@ -75,7 +75,7 @@ radius equation:
 To have an even layout of samples on the spiral, the angle "theta" that turns the plate 
 and the decrease in radius have to be calculated according to the prior radius -> oldRadius
 
-Since CircumferencePerSample = r*2*theta we can solve the equation for theta:
+Since CircumferencePerSample = r*theta we can solve the equation for theta:
 theta        = CircumferencePerSample/(2*oldRadius) 
 
 theta is set into spiral equation:
@@ -93,7 +93,7 @@ r: 35mm theta:  0.003
 
 
 function getTheta(samplesCount, oldRadius){
- return getCircumferencePerSample(samplesCount)/(2*oldRadius) //= 21/(200*r)= 0.105/r
+ return getCircumferencePerSample(samplesCount)/oldRadius;
 
 }
 
@@ -157,12 +157,24 @@ function getPPos(theta){
   return (theta/turnsInRadians) * totalSteps.p;
 }
 
-  
+/**getClientValues:
+ * This function acts as a wrapper for the spiral coordinates that will be passed to 
+ * the client (sketch.js) to draw the preview spiral.
+ */
+
+function getClientStruct(radius, theta, val, scale){
+  var lim = spiralDistance*scale;
+  return {
+    r: (radius*scale + mapToRange(val, -1,1,-lim/2, lim/2)).toFixed(2),
+    t: theta.toFixed(5)
+  };
+}
 
 module.exports = {
   outerRadius,
   getWPos,
   getPPos,
   getRadius,
-  getTheta
+  getTheta,
+  getClientStruct
 };

@@ -17,8 +17,10 @@ var calculate = require('./calculate');
 
 function writeGcode(samples){
 var gcode = [];
+var clientStruct = [];
 var oldRadius = calculate.outerRadius;
 var oldTheta = 0;
+var pxPerMmScale=2;
 
 samples.forEach(function(val, index, array) {
   /*calculating radius and theta:
@@ -38,16 +40,16 @@ samples.forEach(function(val, index, array) {
 
   oldTheta = theta;
   oldRadius = radius;
+  clientStruct.push(calculate.getClientStruct(radius, theta, val, pxPerMmScale));
   gcode.push("G1 W"+wPos.toFixed()+ " P"+pPos.toFixed());
 });
 
-if (gcode){
-  console.log(gcode[20000]);
-  listener.gcodeReady(gcode);
-  return gcode; 
- } else{
-  return new Error('Gcode wasn`t successfully generated.');
- }
+  //listener.gcodeReady(gcode);
+ // listener.clientStructReady(clientStruct);
+  return new Promise((resolve, reject) => {
+    gcode ? resolve({gcode, clientStruct}) : reject('Error creating gcode.');
+    }); 
+
 
 }
 
@@ -55,15 +57,3 @@ if (gcode){
     writeGcode,
     listener
   };
-
-  /*gcode.push("G0 L"+ samples.length);
-
-
-      var steps = .map(function(val, i, arr) {
-      var range = mapToRange(val, -1,1,0,500);
-      var oldRange = mapToRange(arr[i-1], -1,1,0,500);
-      if(oldRange) return Math.round(range - oldRange);
-      else return Math.round(range);
-    }); 
-
-  */
