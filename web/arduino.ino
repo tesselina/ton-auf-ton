@@ -1,5 +1,5 @@
 //https://create.arduino.cc/projecthub/Yogeshmodi/sketch-it-cnc-plotter-95019d
-
+//Mini CNC Plotter firmware, based in TinyCNC https://github.com/MakerBlock/TinyCNC-Sketches
 #include <Stepper.h>
 
 #define LINE_BUFFER_LENGTH 512
