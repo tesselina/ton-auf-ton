@@ -81,10 +81,6 @@ theta        = CircumferencePerSample/(2*oldRadius)
 theta is set into spiral equation:
 radius       = oldRadius- multiplicator* theta; 
         ->   = oldRadius- multiplicator* (CircumferencePerSample/(2*oldRadius))  -> + samplevalue
-            
-            (= oldRadius - (0.79577471545 *0.105)/oldRadius) = 
-             = oldRadius -  0.0835563/oldRadius )
-
 example values:
 r: 132mm theta: 0.000795454
 r: 85mm theta:  0.001235294
@@ -130,11 +126,8 @@ const totalSteps = {
 transforming radius in steps and new coordinate system where starting point of cuttin process is 0 
 mapToRange function was used from:
 
-Title: Javascript Map range of number to another range
-Author : xposedbones
-Institution: Github, Inc. 
-URL:  https://gist.github.com/xposedbones/75ebaef3c10060a3ee3b246166caab56
-Date: 26 Sep 2016
+xposedbones, „Javascript Map range of number to another range“.Github, Inc.. 
+https://gist.github.com/xposedbones/75ebaef3c10060a3ee3b246166caab56, 26.09.2016
 */
 function mapToRange(val, in_min, in_max, out_min, out_max) {
   return (val - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
