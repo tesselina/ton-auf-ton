@@ -87,7 +87,7 @@ function stream(){
     if (i == gcode.length) {
       streaming = false;
       //console.log('streaming finished');
-      listener.streaming(false);
+      listener.streaming(i);
       gcode = [ ];
       i = 0;
       return;
@@ -102,6 +102,7 @@ function stream(){
     }
   });
   i++;
+  listener.streaming(i);
 }
 
 function start(code){
@@ -109,7 +110,7 @@ function start(code){
   if (gcode == null) return;
   streaming = true;
   i = 0;
-  listener.streaming(true);
+  //listener.streaming(i);
   stream();
 }
 

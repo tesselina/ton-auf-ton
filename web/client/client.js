@@ -9,7 +9,11 @@ var selectButton = document.getElementById("fileUpload");
 var startButton= document.getElementById("startButton");
 var toggleButton = document.getElementById("toggleButton");
 var arduino = document.getElementById('arduino');
+var bar = document.getElementById("bar"); 
+var sizeInfo = document.createElement("SPAN");
+sizeInfo.id = "sizeInfo";
 var pause = false;
+var sampleCount;
 
 fileInput.addEventListener("change", getFileName);
 
@@ -18,6 +22,22 @@ socket.on('arduinoConnected', function(state, msg){
   arduino.innerHTML = msg;
  });
 
+
+ socket.on('spiralStruct', function(struct){
+   console.log("spiralstruct", struct.length);
+  sampleCount = struct.length;
+
+/** Checking for filesize */
+  if (sampleCount <= 55000){
+    sizeInfo.innerHTML = "";
+    startButton.disabled = false;
+  } else{
+    sizeInfo.innerHTML = " - Das Audiosignal ist zu groß!";
+    fileInfo.appendChild(sizeInfo);
+    startButton.disabled = true;
+  }
+
+  });
 
 function toggle(element) {
   if (element) {
@@ -41,15 +61,14 @@ function switchColor(newColor){
   plate.classList.add(newColor);
 }
 
+
 function getFileName(){
   if (fileInput.files.length > 0 && ["audio/mpeg", "audio/mp3", "audio/x-wav"].includes(fileInput.files[0].type)) {
     var fileName = fileInput.files[0].name;
+    console.log("fileInfo");
     document.getElementById("fileInfo").innerHTML = fileName;
-    startButton.disabled = false;
     socket.emit('selection', fileName);
-  } else {
-    startButton.disabled = true;
-  }
+  } 
 }
 
 function toggleStreamingProcess (){
@@ -59,16 +78,22 @@ function toggleStreamingProcess (){
 }
 
 function startStreaming(){
+  console.log("count", sampleCount);
   fileInput.disabled = true;
   selectButton.classList.add('disabled');
-  socket.emit('stream', true);
+  socket.emit('clientStream');
   toggle(startButton);
   toggle(toggleButton);
 }
 
 
-socket.on('stream', function(state){
-  if (!state) {
+socket.on('clientStream', function(index){
+  if(index < sampleCount){
+    console.log("bar: ", index, sampleCount,  Math.round(index/sampleCount*100));
+    bar.style.width = index/sampleCount*100 + '%'; 
+  }
+
+  if (index == sampleCount) {
     fileInput.disabled = false;
     selectButton.classList.remove('disabled');
     fileInput.value = '';

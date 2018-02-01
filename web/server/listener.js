@@ -24,8 +24,8 @@ Listener.prototype.arduinoConnected = function (bool, msg, port) {
     this.emit('arduinoConnected', bool, msg, port);
 };
 
-Listener.prototype.streaming = function (bool) {
-    this.emit('streaming', bool);
+Listener.prototype.streaming = function (index) {
+    this.emit('streaming', index);
 };
 
 module.exports = Listener;

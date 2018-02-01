@@ -41,6 +41,11 @@
             <input type="button" id="startButton" value="Starten" onClick="startStreaming()" disabled="true" /> 
             <input type="button" id="toggleButton" onClick="toggleStreamingProcess()" value="Anhalten" style="display: none;"/> 
         </div>
+
+        <div id="writingProgress">
+            <div id="bar"></div>
+          </div>
+
         <div id="colorSelect">
             <div class="circle blue" onClick="switchColor('blue')"></div>
             <div class="circle red" onClick="switchColor('red')"></div>

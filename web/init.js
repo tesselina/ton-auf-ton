@@ -39,6 +39,7 @@ function clientConnection (socket){
     console.log('client-arduino-connection', state);
      socket.emit('arduinoConnected', state, msg);
      socket.on('pause', function(state){
+       console.log('pause', state );
       state ? port.pause() : port.resume(); 
      });
   });
@@ -58,15 +59,15 @@ function clientConnection (socket){
     transform(samples).then((obj) => {
       socket.emit('spiralStruct', obj.clientStruct);
 
-      socket.on('stream', function(state){
-        state ? stream.start(obj.gcode) : console.log('couldnt start stream');
+      socket.on('clientStream', function(){
+        stream.start(obj.gcode);
        });
     });
   });
 
   //whenever streaming variable is changed streaming event is triggered and passes variable to client
-  stream.listener.on('streaming', function (state) {
-    socket.emit('stream', state);
+  stream.listener.on('streaming', function (index) {
+    socket.emit('clientStream', index);
   });
 
 }
