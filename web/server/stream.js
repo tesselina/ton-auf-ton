@@ -85,11 +85,8 @@ function stream(){
   if (!streaming) return;
   while (true) {
     if (i == gcode.length) {
-      streaming = false;
-      //console.log('streaming finished');
       listener.streaming(i);
-      gcode = [ ];
-      i = 0;
+      end();
       return;
     }
     if (gcode[i].trim().length == 0) i++;
@@ -114,10 +111,16 @@ function start(code){
   stream();
 }
 
+function end (){
+  streaming = false;
+  gcode = [ ];
+  i = 0;
+}
 /** listener contains the 'arduinoConnected' event which is used in init.js 
  * to help interact with websocket */
 
  module.exports = {
    listener,
-   start
+   start,
+   end
  };

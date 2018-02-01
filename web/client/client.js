@@ -22,12 +22,8 @@ socket.on('arduinoConnected', function(state, msg){
   arduino.innerHTML = msg;
  });
 
-
  socket.on('spiralStruct', function(struct){
-   console.log("spiralstruct", struct.length);
   sampleCount = struct.length;
-
-/** Checking for filesize */
   if (sampleCount <= 55000){
     sizeInfo.innerHTML = "";
     startButton.disabled = false;
@@ -36,8 +32,23 @@ socket.on('arduinoConnected', function(state, msg){
     fileInfo.appendChild(sizeInfo);
     startButton.disabled = true;
   }
+});
 
-  });
+socket.on('clientStream', function(index){
+  if (index >= sampleCount) {
+    resetAfterStream();
+  } else {
+    bar.style.width = index/sampleCount*100 + '%'; 
+  }
+});
+
+function getFileName(){
+  if (fileInput.files.length > 0 && ["audio/mpeg", "audio/mp3", "audio/x-wav"].includes(fileInput.files[0].type)) {
+    var fileName = fileInput.files[0].name;
+    document.getElementById("fileInfo").innerHTML = fileName;
+    socket.emit('selection', fileName);
+  } 
+}
 
 function toggle(element) {
   if (element) {
@@ -61,14 +72,13 @@ function switchColor(newColor){
   plate.classList.add(newColor);
 }
 
-
-function getFileName(){
-  if (fileInput.files.length > 0 && ["audio/mpeg", "audio/mp3", "audio/x-wav"].includes(fileInput.files[0].type)) {
-    var fileName = fileInput.files[0].name;
-    console.log("fileInfo");
-    document.getElementById("fileInfo").innerHTML = fileName;
-    socket.emit('selection', fileName);
-  } 
+/**Stream Handling  */
+function startStreaming(){
+  socket.emit('clientStream');
+  toggle(startButton);
+  toggle(toggleButton);
+  toggle(selectButton);
+  toggle(abortButton);
 }
 
 function toggleStreamingProcess (){
@@ -77,31 +87,32 @@ function toggleStreamingProcess (){
   toggleButton.value = pause? 'Fortfahren' : 'Anhalten';
 }
 
-function startStreaming(){
-  console.log("count", sampleCount);
-  fileInput.disabled = true;
-  selectButton.classList.add('disabled');
-  socket.emit('clientStream');
+function resetAfterStream(){
+  fileInput.value = '';
+  startButton.disabled = true;
+  document.getElementById("fileInfo").innerHTML = "";
+  bar.style.width = 0 + '%'; 
   toggle(startButton);
   toggle(toggleButton);
+  toggle(selectButton);
+  toggle(abortButton);
+}
+
+function endStreaming(){
+  socket.emit('endStream');
+  resetAfterStream();
 }
 
 
-socket.on('clientStream', function(index){
-  if(index < sampleCount){
-    console.log("bar: ", index, sampleCount,  Math.round(index/sampleCount*100));
-    bar.style.width = index/sampleCount*100 + '%'; 
-  }
-
-  if (index == sampleCount) {
-    fileInput.disabled = false;
-    selectButton.classList.remove('disabled');
-    fileInput.value = '';
-    startButton.disabled = true;
-    document.getElementById("fileInfo").innerHTML = "";
-    toggle(startButton);
-    toggle(toggleButton);
-  }
-  });
 
 
+/**
+ *   
+  fileInput.disabled = true;
+  selectButton.classList.add('disabled');
+  //since button is styled through parent div disabled styling has to be applied to parent
+
+  
+  selectButton.classList.remove('disabled');
+  fileInput.disabled = false;
+ */

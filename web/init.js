@@ -62,6 +62,9 @@ function clientConnection (socket){
       socket.on('clientStream', function(){
         stream.start(obj.gcode);
        });
+       socket.on('endStream', function(){
+        stream.end();
+       });
     });
   });
 
