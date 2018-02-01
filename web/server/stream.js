@@ -96,7 +96,7 @@ function stream(){
     else break;
   }
   port.write(gcode[i] + '\n', function(err) {
-    console.log('write', i);
+    console.log('line:', gcode[i]);
     if (err) {
       return console.log('Error on write: ', err.message);
     }
