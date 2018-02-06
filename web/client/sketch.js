@@ -31,7 +31,6 @@ socket.on('spiralStruct', function(struct){
 
 
   socket.on('clientStream', function(index){
-    print('event', index);
     dotIndex = index;
   });
 
@@ -58,7 +57,6 @@ function draw() {
       }
     endShape();
     if(dotIndex){
-      print('draw', dotIndex);
       noStroke();
       fill(dotColor);
       var xD = spiralStruct[dotIndex].r * cos(spiralStruct[dotIndex].t);

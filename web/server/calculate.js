@@ -14,7 +14,7 @@ URL:https://www.intmath.com/blog/mathematics/length-of-an-archimedean-spiral-659
 */
 
 /*Here are the measurements for my clay discs in mm */
-const outerRadius =  132.5;
+const outerRadius =  130;
 const innerRadius = 30.0;
 const spiralDistance = 5; //distance between spiral arms
 const difference = outerRadius -innerRadius; // 102.5 mm
@@ -141,7 +141,7 @@ function sampleValueToSteps (val){
 }
 
 function getWPos(radius, val){
-  return (outerRadius - radius)* stepsPerMm + sampleValueToSteps(val);
+  return (outerRadius - radius)* stepsPerMm - sampleValueToSteps(val);
 }
 
   //turnsInRadians -> totalSteps.p
