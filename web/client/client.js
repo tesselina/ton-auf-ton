@@ -10,8 +10,8 @@ var startButton= document.getElementById("startButton");
 var toggleButton = document.getElementById("toggleButton");
 var arduino = document.getElementById('arduino');
 var bar = document.getElementById("bar"); 
-var sizeInfo = document.createElement("SPAN");
-sizeInfo.id = "sizeInfo";
+var fileInfo = document.getElementById("fileInfo");
+var sampleInfo = document.getElementById("sampleInfo");
 var pause = false;
 var sampleCount;
 var streaming;
@@ -20,17 +20,21 @@ fileInput.addEventListener("change", getFileName);
 
 socket.on('arduinoConnected', function(state, msg){
    document.getElementById("loader").style.display = "none";
-  arduino.innerHTML = msg;
+   var arduinoInfo = document.createElement("H4");
+   arduinoInfo.innerHTML = msg;
+   arduino.appendChild(arduinoInfo);
  });
 
  socket.on('spiralStruct', function(struct){
+   if(sampleInfo.parentNode.style.display == "none") toggleView(sampleInfo.parentNode);
   sampleCount = struct.length;
   if (sampleCount <= 55000){
-    sizeInfo.innerHTML = "";
+    sampleInfo.classList.remove("error");
     startButton.disabled = false;
+    sampleInfo.innerHTML = sampleCount+ " Samples";
   } else{
-    sizeInfo.innerHTML = " - Das Audiosignal ist zu groß!";
-    fileInfo.appendChild(sizeInfo);
+    sampleInfo.classList.add("error");
+    sampleInfo.innerHTML = " - Das Audiosignal ist zu groß!";
     startButton.disabled = true;
   }
 });
@@ -46,7 +50,7 @@ socket.on('clientStream', function(index){
 function getFileName(){
   if (fileInput.files.length > 0 && ["audio/mpeg", "audio/mp3", "audio/x-wav"].includes(fileInput.files[0].type)) {
     var fileName = fileInput.files[0].name;
-    document.getElementById("fileInfo").innerHTML = fileName;
+    fileInfo.innerHTML = fileName;
     socket.emit('selection', fileName);
   } 
 }
@@ -92,7 +96,8 @@ function resetAfterStream(){
   streaming = false;
   fileInput.value = '';
   startButton.disabled = true;
-  document.getElementById("fileInfo").innerHTML = "";
+  //fileInfo.innerHTML = "";
+  toggleView(sampleInfo.parentNode);
   bar.style.width = 0 + '%'; 
   toggleView(startButton);
   toggleView(toggleButton);

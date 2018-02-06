@@ -23,16 +23,13 @@
 </head>
 
 <body>
-   <div id="header">
-        <img src="/public/buchstaben.png" alt="Cut Out Letters" width="700" height="96">
+   <div id="content">
+   <div id="control">
+        <h1>TON auf TON</h1>
         <div id ="arduino">
                 <div id="loader"></div>
         </div>
-   </div>
-    
-   <div id="control">
-       <p>Ton auf Ton ist eine Maschine, die es möglich macht Schall auf Keramik festzuhalten. Digitale Tonsequenzen von bis zu zehn Sekunden treffen auf handfesten Ton, auf dem sie eingraviert und verewigt werden. 
-        Wähle zunächst eine Tonsequenz aus und wenn dir die Vorschau gefällt beginne den Schreibprozess über Starten. </p>
+       <p> Wähle eine Tonsequenz mit höchstens 55000 Samples aus. Wenn dir die Vorschau gefällt, kannst du den Schreibprozess über Starten beginnen. </p>
        <div class="mainButtonsBox">
               <div id="fileUpload" class="button">
                 <span>Auswählen</span>
@@ -53,11 +50,13 @@
             <div class="circle grey" onClick="switchColor('grey')"></div>
             <div class="circle green" onClick="switchColor('green')"></div>
         </div>
+        <h4 style="display: none;">Auswahl: <span id="fileInfo"></span>, <span id="sampleInfo"></span></h4> 
+        
 
    </div>
    <div id="preview">
-        <p id="fileInfo"></p>
    </div>
+</div>
         
 
     <script src="/socket.io/socket.io.js"></script>
