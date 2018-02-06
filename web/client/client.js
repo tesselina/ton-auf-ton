@@ -14,6 +14,7 @@ var sizeInfo = document.createElement("SPAN");
 sizeInfo.id = "sizeInfo";
 var pause = false;
 var sampleCount;
+var streaming;
 
 fileInput.addEventListener("change", getFileName);
 
@@ -50,7 +51,7 @@ function getFileName(){
   } 
 }
 
-function toggle(element) {
+function toggleView(element) {
   if (element) {
       var display = element.style.display;
 
@@ -64,7 +65,6 @@ function toggle(element) {
 
 function switchColor(newColor){
   var plate = document.getElementById("plate");
-  console.log('switch', newColor, plate);
   var colors = ['red', 'green', 'blue', 'grey'];
   colors.forEach(function(color) {
     plate.classList.remove(color);
@@ -74,11 +74,12 @@ function switchColor(newColor){
 
 /**Stream Handling  */
 function startStreaming(){
+  streaming = true;
   socket.emit('clientStream');
-  toggle(startButton);
-  toggle(toggleButton);
-  toggle(selectButton);
-  toggle(abortButton);
+  toggleView(startButton);
+  toggleView(toggleButton);
+  toggleView(selectButton);
+  toggleView(abortButton);
 }
 
 function toggleStreamingProcess (){
@@ -88,14 +89,15 @@ function toggleStreamingProcess (){
 }
 
 function resetAfterStream(){
+  streaming = false;
   fileInput.value = '';
   startButton.disabled = true;
   document.getElementById("fileInfo").innerHTML = "";
   bar.style.width = 0 + '%'; 
-  toggle(startButton);
-  toggle(toggleButton);
-  toggle(selectButton);
-  toggle(abortButton);
+  toggleView(startButton);
+  toggleView(toggleButton);
+  toggleView(selectButton);
+  toggleView(abortButton);
 }
 
 function endStreaming(){
@@ -103,16 +105,18 @@ function endStreaming(){
   resetAfterStream();
 }
 
+document.addEventListener("keydown", controlMotors);
 
+function controlMotors(event) {
 
-
-/**
- *   
-  fileInput.disabled = true;
-  selectButton.classList.add('disabled');
-  //since button is styled through parent div disabled styling has to be applied to parent
-
-  
-  selectButton.classList.remove('disabled');
-  fileInput.disabled = false;
- */
+  if (!streaming){
+    if (event.keyCode == '37') {
+      socket.emit('left');
+      // left arrow
+    }
+    else if (event.keyCode == '39') {
+      socket.emit('right');
+      // right arrow
+    }
+  }
+}

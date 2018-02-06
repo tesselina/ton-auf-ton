@@ -34,7 +34,7 @@ Stepper stepperWaves(stepsPerRevolution.w * microSteps.w, 3,4);
 struct vector actuatorPos;
 
 float StepInc = 1;
-int StepDelay = 0;
+int StepDelay = 50;
 int LineDelay = 1;
 
 //pulley 16 zähne - zahnrad 266 zähne 
@@ -181,11 +181,14 @@ void processIncomingLine( char* line, int charNB ) {
         break;
       }
       break;
+      
+      case 'M':
+      char* indexD = strchr( line+currentIndex, 'D');
+      float dir = atof( indexD + 1);
+        stepperWaves.step(dir);
+      break;
     }
   }
-
-
-
 }
 
 
@@ -215,40 +218,40 @@ void drawLine(float w1, float p1) {
   int sw = w0<w1 ? StepInc : -StepInc;
   int sp = p0<p1 ? StepInc : -StepInc;
 
-  long i;
-  long over = 0;
+   long i;
+   for (i=0; i<dw; ++i) {
+     stepperWaves.step(sw);
+     delayMicroseconds(StepDelay);
+   }
+   for (i=0; i<dp; ++i) {
+     stepperPlate.step(sp);
+     delayMicroseconds(StepDelay);
+   }
+  // long over = 0;
 
-  if (dw > dp) {
-    for (i=0; i<dw; ++i) {
-      stepperWaves.step(sw);
-      over+=dp;
-      if (over>=dw) {
-        over-=dw;
-       stepperPlate.step(sp);
-      }
-      delay(StepDelay);
-    }
-  }
-  else {
-    for (i=0; i<dp; ++i) {
-      stepperPlate.step(sp);
-      over+=dw;
-      if (over>=dp) {
-        over-=dp;
-        stepperWaves.step(sw);
-      }
-      delay(StepDelay);
-    }    
-  }
+  // if (dw > dp) {
+  //   for (i=0; i<dw; ++i) {
+  //     stepperWaves.step(sw);
+  //     over+=dp;
+  //     if (over>=dw) {
+  //       over-=dw;
+  //      stepperPlate.step(sp);
+  //     }
+  //     delay(StepDelay);
+  //   }
+  // }
+  // else {
+  //   for (i=0; i<dp; ++i) {
+  //     stepperPlate.step(sp);
+  //     over+=dw;
+  //     if (over>=dp) {
+  //       over-=dp;
+  //       stepperWaves.step(sw);
+  //     }
+  //     delay(StepDelay);
+  //   }    
+  // }
 
-  if (verbose)
-  {
-    Serial.print("dw, dp:");
-    Serial.print(dw);
-    Serial.print(",");
-    Serial.print(dp);
-    Serial.println("");
-  }
 
   //  Delay before any next lines are submitted
   delay(LineDelay);

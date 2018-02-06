@@ -42,7 +42,14 @@ function clientConnection (socket){
        console.log('pause', state );
       state ? port.pause() : port.resume(); 
      });
+     socket.on('left', function(){
+      port.write("M D-400\n");
+     });
+     socket.on('right', function(){
+      port.write("M D400\n");
+     });
   });
+
   console.log('Client: ', socket.id);
 
   /** Ugly: This works only when soundfiles are located in the public/assets folder. 
